@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:student_management/application/students/students_cubit.dart';
 import 'package:student_management/core/constants.dart';
 
 class SearchWidget extends StatelessWidget {
@@ -15,6 +17,9 @@ class SearchWidget extends StatelessWidget {
       width: screenSize.width * 0.85,
       height: 50,
       child: TextFormField(
+        onChanged: (value) {
+          BlocProvider.of<StudentsCubit>(context).searchStudent(value);
+        },
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(left: 20),
           filled: true,

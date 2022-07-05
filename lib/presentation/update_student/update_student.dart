@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,20 +8,30 @@ import 'package:student_management/core/constants.dart';
 import 'package:student_management/domain/student_model.dart';
 import 'package:student_management/presentation/widgets/text_form_widget.dart';
 
-class AddStudent extends StatelessWidget {
-  AddStudent({Key? key}) : super(key: key);
+class UpdateStudent extends StatelessWidget {
+  final int index;
+  final StudentModel studentDat;
+  UpdateStudent({Key? key, required this.index, required this.studentDat})
+      : super(key: key);
   var formKey = GlobalKey<FormState>();
-  var _nameCtrl = TextEditingController();
-  var _ageCtrl = TextEditingController();
-  var _branchCtrl = TextEditingController();
-  var _placeCtrl = TextEditingController();
-  var _phoneCtrl = TextEditingController();
-  var _image;
+  var _upNameCtrl = TextEditingController();
+  var _upAgeCtrl = TextEditingController();
+  var _upBranchCtrl = TextEditingController();
+  var _upPlaceCtrl = TextEditingController();
+  var _upPhoneCtrl = TextEditingController();
+  var _upImage;
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-
+    _upImage = studentDat.image;
+    if (_upNameCtrl.text.isEmpty) {
+      _upNameCtrl.text = studentDat.name;
+      _upAgeCtrl.text = studentDat.age;
+      _upBranchCtrl.text = studentDat.branch;
+      _upPlaceCtrl.text = studentDat.place;
+      _upPhoneCtrl.text = studentDat.phone;
+    }
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -32,7 +44,7 @@ class AddStudent extends StatelessWidget {
               },
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
           title: const Text(
-            'Add Student',
+            'Edit Student',
             style: mainTitle,
           ),
           centerTitle: true,
@@ -49,20 +61,28 @@ class AddStudent extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: blackclr,
                   radius: 70,
-                  child: ClipOval(
-                    child: Image.network(
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvgBWbSH3w-xh3MDUV9ARmjVGaYr5SqRC6fg&usqp=CAU',
-                      fit: BoxFit.cover,
-                      height: 135,
-                      width: 135,
-                    ),
+                  child: BlocBuilder<StudentsCubit, StudentsState>(
+                    builder: (context, state) {
+                      return Container(
+                        width: 135,
+                        height: 135,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: FileImage(
+                                    File(state.imgPath ?? studentDat.image)),
+                                fit: BoxFit.cover),
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(135)),
+                      );
+                    },
                   ),
                 ),
               ),
+
               sbHeight10,
               ElevatedButton.icon(
                   onPressed: () async {
-                    _image = await pickImage();
+                    _upImage = await pickImage(context, index);
                   },
                   icon: const Icon(Icons.image),
                   label: const Text('Image')),
@@ -72,7 +92,7 @@ class AddStudent extends StatelessWidget {
                 screenSize: screenSize,
                 hintTxt: 'Name',
                 formWidth: screenSize.width * 0.9,
-                ctrl: _nameCtrl,
+                ctrl: _upNameCtrl,
               ),
               sbHeight20,
               Row(
@@ -83,13 +103,13 @@ class AddStudent extends StatelessWidget {
                     hintTxt: 'Age',
                     formWidth: screenSize.width * 0.4,
                     isInputNumber: true,
-                    ctrl: _ageCtrl,
+                    ctrl: _upAgeCtrl,
                   ),
                   TextFormWidget(
                     screenSize: screenSize,
                     hintTxt: 'Branch',
                     formWidth: screenSize.width * 0.4,
-                    ctrl: _branchCtrl,
+                    ctrl: _upBranchCtrl,
                   ),
                 ],
               ),
@@ -98,14 +118,14 @@ class AddStudent extends StatelessWidget {
                 screenSize: screenSize,
                 hintTxt: 'Place',
                 formWidth: screenSize.width * 0.9,
-                ctrl: _placeCtrl,
+                ctrl: _upPlaceCtrl,
               ),
               sbHeight20,
               TextFormWidget(
                 screenSize: screenSize,
                 hintTxt: 'Phone',
                 formWidth: screenSize.width * 0.9,
-                ctrl: _phoneCtrl,
+                ctrl: _upPhoneCtrl,
                 isInputNumber: true,
               ),
               sbHeight30,
@@ -115,7 +135,7 @@ class AddStudent extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                       primary: Colors.green, fixedSize: const Size(110, 45)),
                   onPressed: () {
-                    addButtonClicked(context);
+                    saveButtonClicked(context);
                   },
                   icon: const Icon(Icons.save),
                   label: const Text(
@@ -127,50 +147,46 @@ class AddStudent extends StatelessWidget {
         ));
   }
 
-  Future pickImage() async {
+  Future pickImage(BuildContext context, int idx) async {
     XFile? img = await ImagePicker().pickImage(source: ImageSource.gallery);
-    return img!.path;
+    if (img != null) {
+      BlocProvider.of<StudentsCubit>(context).updateImage(img.path);
+      return img.path;
+    } else {
+      return;
+    }
   }
 
-  addButtonClicked(BuildContext context) {
+  saveButtonClicked(BuildContext context) {
     final isValid = formKey.currentState!.validate();
-    if (isValid && _image != null) {
-      final String _name = _nameCtrl.text.trim();
-      final String _branch = _branchCtrl.text.trim();
-      final String _age = _ageCtrl.text;
-      final String _place = _placeCtrl.text;
-      final String _phone = _phoneCtrl.text;
+    if (isValid) {
+      final String _name = _upNameCtrl.text.trim();
+      final String _branch = _upBranchCtrl.text.trim();
+      final String _age = _upAgeCtrl.text.trim();
+      final String _place = _upPlaceCtrl.text.trim();
+      final String _phone = _upPhoneCtrl.text.trim();
       final _studentDetail = StudentModel(
           name: _name,
           age: _age,
           branch: _branch,
           place: _place,
           phone: _phone,
-          image: _image);
-
-      BlocProvider.of<StudentsCubit>(context).addStudent(_studentDetail);
+          image: _upImage);
+      BlocProvider.of<StudentsCubit>(context)
+          .updateStudent(_studentDetail, index);
       Navigator.of(context).pop();
-      _nameCtrl.clear();
-      _ageCtrl.clear();
-      _branchCtrl.clear();
-      _placeCtrl.clear();
-      _phoneCtrl.clear();
+      _upNameCtrl.clear();
+      _upAgeCtrl.clear();
+      _upBranchCtrl.clear();
+      _upPlaceCtrl.clear();
+      _upPhoneCtrl.clear();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(
-          'Student Added Successfully',
+          'Edited Successfully',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.green,
       ));
-    } else if (_image == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(
-          'Please Upload an Image',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.red,
-      ));
-      return false;
     } else {
       return;
     }

@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:student_management/core/constants.dart';
 
 class TopSection extends StatelessWidget {
+  final String imageUrl;
   const TopSection({
     Key? key,
     required this.screenSize,
+    required this.imageUrl,
   }) : super(key: key);
 
   final Size screenSize;
@@ -42,8 +46,7 @@ class TopSection extends StatelessWidget {
               height: 165,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: NetworkImage(
-                          'https://media-exp1.licdn.com/dms/image/C5603AQFlijk7Al-WwQ/profile-displayphoto-shrink_200_200/0/1632900587777?e=1660176000&v=beta&t=odTh8YWZxKhCTCOG5w3j5O3G016nDY-AI2PlGMRovEc')),
+                      image: FileImage(File(imageUrl)), fit: BoxFit.cover),
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(165)),
             ),
