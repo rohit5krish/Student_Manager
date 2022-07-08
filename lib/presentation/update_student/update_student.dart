@@ -93,6 +93,7 @@ class UpdateStudent extends StatelessWidget {
                 hintTxt: 'Name',
                 formWidth: screenSize.width * 0.9,
                 ctrl: _upNameCtrl,
+                formKey: formKey,
               ),
               sbHeight20,
               Row(
@@ -104,12 +105,14 @@ class UpdateStudent extends StatelessWidget {
                     formWidth: screenSize.width * 0.4,
                     isInputNumber: true,
                     ctrl: _upAgeCtrl,
+                    formKey: formKey,
                   ),
                   TextFormWidget(
                     screenSize: screenSize,
                     hintTxt: 'Branch',
                     formWidth: screenSize.width * 0.4,
                     ctrl: _upBranchCtrl,
+                    formKey: formKey,
                   ),
                 ],
               ),
@@ -119,6 +122,7 @@ class UpdateStudent extends StatelessWidget {
                 hintTxt: 'Place',
                 formWidth: screenSize.width * 0.9,
                 ctrl: _upPlaceCtrl,
+                formKey: formKey,
               ),
               sbHeight20,
               TextFormWidget(
@@ -127,6 +131,7 @@ class UpdateStudent extends StatelessWidget {
                 formWidth: screenSize.width * 0.9,
                 ctrl: _upPhoneCtrl,
                 isInputNumber: true,
+                formKey: formKey,
               ),
               sbHeight30,
 

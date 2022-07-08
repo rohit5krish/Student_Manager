@@ -5,6 +5,7 @@ class TextFormWidget extends StatelessWidget {
   final double formWidth;
   final bool isInputNumber;
   final TextEditingController ctrl;
+  final GlobalKey<FormState> formKey;
   const TextFormWidget({
     Key? key,
     required this.screenSize,
@@ -12,6 +13,7 @@ class TextFormWidget extends StatelessWidget {
     required this.formWidth,
     required this.ctrl,
     this.isInputNumber = false,
+    required this.formKey,
   }) : super(key: key);
 
   final Size screenSize;
@@ -23,6 +25,12 @@ class TextFormWidget extends StatelessWidget {
       child: TextFormField(
         controller: ctrl,
         keyboardType: isInputNumber ? TextInputType.number : TextInputType.text,
+        textCapitalization: TextCapitalization.sentences,
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            formKey.currentState!.validate();
+          }
+        },
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Enter $hintTxt';
@@ -32,8 +40,8 @@ class TextFormWidget extends StatelessWidget {
         },
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(left: 15),
-          border: OutlineInputBorder(),
-          labelText: '$hintTxt',
+          border: const OutlineInputBorder(),
+          labelText: hintTxt,
         ),
       ),
     );

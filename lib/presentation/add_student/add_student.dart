@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +17,7 @@ class AddStudent extends StatelessWidget {
   var _placeCtrl = TextEditingController();
   var _phoneCtrl = TextEditingController();
   var _image;
-
+  bool isDefaultDp = true;
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -50,11 +52,24 @@ class AddStudent extends StatelessWidget {
                   backgroundColor: blackclr,
                   radius: 70,
                   child: ClipOval(
-                    child: Image.network(
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvgBWbSH3w-xh3MDUV9ARmjVGaYr5SqRC6fg&usqp=CAU',
-                      fit: BoxFit.cover,
-                      height: 135,
-                      width: 135,
+                    child: BlocBuilder<StudentsCubit, StudentsState>(
+                      builder: (context, state) {
+                        if (isDefaultDp) {
+                          return Image.asset(
+                            'assets/DefaultDp.png',
+                            fit: BoxFit.cover,
+                            height: 135,
+                            width: 135,
+                          );
+                        } else {
+                          return Image.file(
+                            File('${state.imgPath}'),
+                            fit: BoxFit.cover,
+                            height: 135,
+                            width: 135,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -62,7 +77,8 @@ class AddStudent extends StatelessWidget {
               sbHeight10,
               ElevatedButton.icon(
                   onPressed: () async {
-                    _image = await pickImage();
+                    _image = await pickImage(context);
+                    _image != null ? isDefaultDp = false : isDefaultDp = true;
                   },
                   icon: const Icon(Icons.image),
                   label: const Text('Image')),
@@ -73,6 +89,7 @@ class AddStudent extends StatelessWidget {
                 hintTxt: 'Name',
                 formWidth: screenSize.width * 0.9,
                 ctrl: _nameCtrl,
+                formKey: formKey,
               ),
               sbHeight20,
               Row(
@@ -84,12 +101,14 @@ class AddStudent extends StatelessWidget {
                     formWidth: screenSize.width * 0.4,
                     isInputNumber: true,
                     ctrl: _ageCtrl,
+                    formKey: formKey,
                   ),
                   TextFormWidget(
                     screenSize: screenSize,
                     hintTxt: 'Branch',
                     formWidth: screenSize.width * 0.4,
                     ctrl: _branchCtrl,
+                    formKey: formKey,
                   ),
                 ],
               ),
@@ -99,6 +118,7 @@ class AddStudent extends StatelessWidget {
                 hintTxt: 'Place',
                 formWidth: screenSize.width * 0.9,
                 ctrl: _placeCtrl,
+                formKey: formKey,
               ),
               sbHeight20,
               TextFormWidget(
@@ -107,6 +127,7 @@ class AddStudent extends StatelessWidget {
                 formWidth: screenSize.width * 0.9,
                 ctrl: _phoneCtrl,
                 isInputNumber: true,
+                formKey: formKey,
               ),
               sbHeight30,
 
@@ -127,9 +148,14 @@ class AddStudent extends StatelessWidget {
         ));
   }
 
-  Future pickImage() async {
+  Future pickImage(BuildContext context) async {
     XFile? img = await ImagePicker().pickImage(source: ImageSource.gallery);
-    return img!.path;
+    if (img != null) {
+      BlocProvider.of<StudentsCubit>(context).updateImage(img.path);
+      return img.path;
+    } else {
+      return;
+    }
   }
 
   addButtonClicked(BuildContext context) {

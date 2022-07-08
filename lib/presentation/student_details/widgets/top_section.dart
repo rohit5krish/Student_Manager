@@ -22,10 +22,10 @@ class TopSection extends StatelessWidget {
           height: 220,
           color: blackclr,
         ),
-        SizedBox(
+        const SizedBox(
           height: 320,
         ),
-        Positioned(
+        const Positioned(
           top: 120,
           left: 0,
           right: 0,
@@ -61,11 +61,11 @@ class TopSection extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back_ios, color: Colors.white)),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
               SizedBox(
                 width: screenSize.width * 0.15,
               ),
-              Text('Student Details', style: mainTitle),
+              const Text('Student Details', style: mainTitle),
             ],
           ),
         ),

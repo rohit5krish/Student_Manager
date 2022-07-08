@@ -45,4 +45,30 @@ class StudentsCubit extends Cubit<StudentsState> {
     }
     return emit(StudentsState(studentsList: result));
   }
+
+  void multiSelection(StudentModel data) {
+    if (state.selectedStudents.contains(data)) {
+      state.selectedStudents.remove(data);
+      return emit(StudentsState(
+          studentsList: state.studentsList,
+          selectedStudents: state.selectedStudents));
+    } else {
+      List<StudentModel> selectedStudentsList = [];
+      selectedStudentsList.addAll(state.selectedStudents);
+      selectedStudentsList.add(data);
+      return emit(StudentsState(
+          studentsList: state.studentsList,
+          selectedStudents: selectedStudentsList));
+    }
+  }
+
+  bool onBackPress() {
+    if (state.selectedStudents.isEmpty) {
+      return true;
+    } else {
+      emit(StudentsState(
+          studentsList: state.studentsList, selectedStudents: []));
+      return false;
+    }
+  }
 }
