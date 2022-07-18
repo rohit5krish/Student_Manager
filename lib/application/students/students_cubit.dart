@@ -1,6 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:meta/meta.dart';
 import 'package:student_management/domain/student_model.dart';
 import 'package:student_management/main.dart';
 

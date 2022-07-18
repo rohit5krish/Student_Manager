@@ -136,17 +136,22 @@ class UpdateStudent extends StatelessWidget {
               sbHeight30,
 
               // Submit button
-              ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.green, fixedSize: const Size(110, 45)),
-                  onPressed: () {
-                    saveButtonClicked(context);
-                  },
-                  icon: const Icon(Icons.save),
-                  label: const Text(
-                    'Save',
-                    style: TextStyle(fontSize: 16),
-                  )),
+              BlocBuilder<StudentsCubit, StudentsState>(
+                builder: (context, state) {
+                  return ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.green,
+                          fixedSize: const Size(110, 45)),
+                      onPressed: () {
+                        saveButtonClicked(context, state.imgPath.toString());
+                      },
+                      icon: const Icon(Icons.save),
+                      label: const Text(
+                        'Save',
+                        style: TextStyle(fontSize: 16),
+                      ));
+                },
+              ),
             ],
           ),
         ));
@@ -162,7 +167,7 @@ class UpdateStudent extends StatelessWidget {
     }
   }
 
-  saveButtonClicked(BuildContext context) {
+  saveButtonClicked(BuildContext context, String imagePath) {
     final isValid = formKey.currentState!.validate();
     if (isValid) {
       final String _name = _upNameCtrl.text.trim();
@@ -176,7 +181,7 @@ class UpdateStudent extends StatelessWidget {
           branch: _branch,
           place: _place,
           phone: _phone,
-          image: _upImage);
+          image: imagePath);
       BlocProvider.of<StudentsCubit>(context)
           .updateStudent(_studentDetail, index);
       Navigator.of(context).pop();
